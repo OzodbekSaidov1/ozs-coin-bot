@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>OZS TAP - Final Masterpiece</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+  :root {
+    --bg-dark: #05060a;
+    --bg-card: #121420;
+    --accent-gold: #ffcc00;
+    --accent-blue: #00d2ff;
+    --accent-green: #00ff88;
+    --text-white: #ffffff;
+  }
+
+  * { 
+    box-sizing: border-box; 
+    user-select: none; 
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation; 
+  }
+
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-white);
+    height: 100dvh; width: 100vw;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  #intro {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    animation: fadeOut 1s forwards 1.5s;
+  }
+  @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+  .header { padding: env(safe-area-inset-top, 20px) 20px 5px; display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 11px; color: var(--accent-blue); }
+  
+  .score-section { text-align: center; margin-top: 1vh; }
+  .score-section h1 { font-size: 48px; margin: 0; font-weight: 900; color: var(--accent-gold); text-shadow: 0 0 25px rgba(255,204,0,0.4); }
+
+  .game-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; touch-action: none; }
+  
+  .main-coin {
+    width: 75vw; height: 75vw; max-width: 320px; max-height: 320px;
+    background: radial-gradient(circle, #ffeb7a 0%, #ffcc00 50%, #b38600 100%);
+    border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 0 60px rgba(0,0,0,0.6), inset 0 0 25px rgba(255,255,255,0.7);
+    border: 8px solid #cc9900;
+    z-index: 10; font-size: 110px;
+    transition: transform 0.05s cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .tap-number { position: absolute; color: white; font-size: 40px; font-weight: 900; pointer-events: none; animation: floatUp 0.8s forwards; font-family: 'Orbitron'; z-index: 1000; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+  @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-200px) scale(1.3); opacity: 0; } }
+
+  .status-panel { padding: 10px 25px 25px; }
+  .bar-info { display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; margin-bottom: 6px; font-family: 'Orbitron'; }
+  .bar-bg { width: 100%; height: 15px; background: #1a1c29; border-radius: 12px; border: 1px solid #2a2d3e; overflow: hidden; }
+  .bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #00d2ff, #3a7bd5); transition: width 0.1s; }
+
+  .navbar {
+    display: flex; justify-content: space-around; background: var(--bg-card);
+    padding: 12px 5px calc(15px + env(safe-area-inset-bottom, 0px));
+    border-radius: 25px 25px 0 0; border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .nav-btn { background: none; border: none; color: #666; font-size: 10px; font-weight: 700; flex: 1; outline: none; }
+  .nav-btn.active { color: var(--accent-blue); }
+  .nav-btn span { display: block; font-size: 24px; margin-bottom: 4px; }
+
+  .modal {
+    position: fixed; bottom: -100%; left: 0; width: 100%; height: 85dvh;
+    background: var(--bg-card); border-radius: 40px 40px 0 0;
+    z-index: 2000; transition: bottom 0.4s cubic-bezier(0.17, 0.84, 0.44, 1);
+    padding: 30px 20px; overflow-y: auto; border-top: 3px solid var(--accent-blue);
+  }
+  .modal.open { bottom: 0; }
+  .modal-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-family: 'Orbitron'; }
+  
+  .boost-tab { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+  .tab-item { background: #1a1c29; padding: 12px 20px; border-radius: 15px; font-size: 12px; white-space: nowrap; border: 1px solid #333; color: #aaa; }
+  .tab-item.active { background: var(--accent-blue); color: #000; border-color: var(--accent-blue); font-weight: 800; }
+
+  .item-card {
+    background: rgba(255,255,255,0.04); padding: 18px; border-radius: 22px;
+    margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .btn-buy { background: var(--accent-blue); color: #000; border: none; padding: 12px 18px; border-radius: 15px; font-weight: 900; font-size: 13px; transition: 0.3s; }
+  .btn-buy:disabled { background: #222; color: #555; }
+
+  .wheel-container {
+    width: 280px; height: 280px; margin: 10px auto 30px; position: relative;
+    border: 12px solid #1a1c29; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  }
+  .wheel-svg { width: 100%; height: 100%; transition: transform 4s cubic-bezier(0.15, 0, 0.1, 1); }
+  .wheel-pointer {
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+    border-top: 30px solid #ff4444; z-index: 10;
+  }
+
+  #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1500; }
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <div style="font-family:'Orbitron'; font-size:60px; color:var(--accent-blue); text-shadow: 0 0 20px var(--accent-blue);">OZS</div>
+  <p style="letter-spacing:8px; font-size:12px; color:#666; font-weight:bold;">FINAL BALANCED</p>
+</div>
+
+<div class="header">
+  <div>PLAYER: <span id="userDisplay" style="color:white">SAIDOV て</span></div>
+  <div style="letter-spacing: 2px;">OZS STUDIO PRO</div>
+</div>
+
+<div class="score-section">
+  <p style="margin:0; opacity:0.4; font-size:12px; font-weight:700;">TOTAL ASSETS</p>
+  <h1>🪙 <span id="balance">0</span></h1>
+</div>
+
+<div class="game-container" id="tapSurface">
+  <div class="main-coin" id="coinBtn">🪙</div>
+</div>
+
+<div class="status-panel">
+  <div class="bar-info">
+    <span>⚡ ENERGY</span>
+    <span><span id="energyVal">1000</span> / <span id="maxEnergyVal">1000</span></span>
+  </div>
+  <div class="bar-bg"><div class="bar-fill" id="energyFill"></div></div>
+</div>
+
+<div class="navbar">
+  <button class="nav-btn" onclick="openM('boostM')"><span>🚀</span>Boosters</button>
+  <button class="nav-btn" onclick="openM('luckyM')"><span>🎡</span>Lucky</button>
+  <button class="nav-btn" onclick="openM('bonusM')"><span>🎁</span>Bonus</button>
+  <button class="nav-btn" onclick="openM('walletM')"><span>💰</span>Wallet</button>
+</div>
+
+<div id="overlay" onclick="closeAll()"></div>
+
+<div id="boostM" class="modal">
+  <div class="modal-h"><h3>Upgrades</h3><span onclick="closeAll()" style="font-size:28px;">✕</span></div>
+  <div class="boost-tab">
+    <div id="tab-tap" class="tab-item active" onclick="showTab('tap')">Tap Power</div>
+    <div id="tab-limit" class="tab-item" onclick="showTab('limit')">Energy Limit</div>
+    <div id="tab-speed" class="tab-item" onclick="showTab('speed')">Recharge</div>
+    <div id="tab-special" class="tab-item" onclick="showTab('special')">Special</div>
+  </div>
+  <div id="boostContent"></div>
+</div>
+
+<div id="luckyM" class="modal">
+  <div class="modal-h"><h3>Lucky Wheel</h3><span onclick="closeAll()">✕</span></div>
+  <div class="wheel-container">
+    <div class="wheel-pointer"></div>
+    <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#121420" stroke="#ffcc00" stroke-width="2"/>
+      <path d="M50 50 L50 2 A48 48 0 0 1 92 26 Z" fill="#ffcc00"/>
+      <path d="M50 50 L92 26 A48 48 0 0 1 92 74 Z" fill="#00d2ff"/>
+      <path d="M50 50 L92 74 A48 48 0 0 1 50 98 Z" fill="#ffcc00"/>
+      <path d="M50 50 L50 98 A48 48 0 0 1 8 74 Z" fill="#00d2ff"/>
+      <path d="M50 50 L8 74 A48 48 0 0 1 8 26 Z" fill="#ffcc00"/>
+      <path d="M50 50 L8 26 A48 48 0 0 1 50 2 Z" fill="#00d2ff"/>
+      <circle cx="50" cy="50" r="5" fill="white"/>
+    </svg>
+  </div>
+  <button id="spinBtn" class="btn-buy" style="width:100%; height:65px; font-size:20px;" onclick="doSpin()">SPIN (5,000 🪙)</button>
+  <div style="margin-top:20px; background:rgba(0,0,0,0.2); padding:15px; border-radius:20px; font-size:13px;">
+    <p>🎁 Yutuqlar: <b>500,000 / 25,000 / 15,000 / 5,000 / 0</b></p>
+  </div>
+</div>
+
+<div id="bonusM" class="modal">
+    <div class="modal-h"><h3>Kunlik Bonus</h3><span onclick="closeAll()">✕</span></div>
+    <div style="text-align:center; padding: 10px;">
+      <div id="bonusIcon" style="font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent-gold));">🎁</div>
+      <h2 id="streakText" style="color: var(--accent-gold); font-family: 'Orbitron'; margin: 5px 0;">Kun: 0</h2>
+      <p id="bonusStatus" style="opacity: 0.7; font-size: 14px; min-height: 40px;">Yuklanmoqda...</p>
+      
+      <button id="claimBonusBtn" class="btn-buy" style="width:100%; height:65px; font-size:18px; margin-top: 15px;" onclick="claimDailyBonus()">
+        BONUSNI OLISH (10,000 🪙)
+      </button>
+      
+      <div style="margin-top:25px; font-size:12px; color:#888; border-top: 1px solid #333; padding-top: 15px; line-height: 1.6;">
+        * Har kuni 10,000 tanga sovg'a! <br>
+        * Har <b>100 kun</b>da 10,000 o'rniga maxsus yutuq!
+      </div>
+    </div>
+</div>
+
+<div id="walletM" class="modal">
+  <div class="modal-h"><h3>Hamyon</h3><span onclick="closeAll()">✕</span></div>
+  <div style="background:linear-gradient(135deg, #1e2548, #0a0c1a); padding:35px; border-radius:30px; border:1px solid #2a2d3e; text-align:center;">
+    <p style="font-size:13px; opacity:0.6; margin:0; letter-spacing:1px;">MY ASSETS VALUE</p>
+    <h1 id="usdVal" style="margin:12px 0; color:var(--accent-blue); font-family:'Orbitron'; font-size:35px;">$0.0000</h1>
+    <h3 id="uzsVal" style="margin:0; opacity:0.9; font-weight:400; color:var(--accent-green);">0 UZS</h3>
+  </div>
+  <div style="margin-top:25px; padding:15px; background:rgba(255,255,255,0.03); border-radius:15px; font-size:12px; color:#888;">
+    * 1M Coins = $0.25 <br>
+    * Chiqarish: Minimal $10.00
+  </div>
+</div>
+
+<div id="infoM" class="modal">
+  <div class="modal-h"><h3>Aloqa</h3><span onclick="closeAll()">✕</span></div>
+  <p style="opacity:0.6; margin-bottom:20px;">Savollar va takliflar uchun administrator bilan bog'laning:</p>
+  <a href="https://instagram.com/0zodbek.saidov" target="_blank" class="item-card" style="text-decoration:none; color:white; background: linear-gradient(45deg, #f09433, #dc2743);">
+    <div><p style="font-weight:700;">Saidov て (Developer)</p><p style="font-size:12px; color:white; opacity:0.8;">@0zodbek.saidov</p></div>
+    <span style="font-size:24px;">📸</span>
+  </a>
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+if(tg) { tg.expand(); tg.enableClosingConfirmation(); }
+
+// GAME STATE
+let coins = Number(localStorage.getItem("ozs_fb_coins")) || 0;
+let energy = Number(localStorage.getItem("ozs_fb_energy")) || 1000;
+let tapLvl = Number(localStorage.getItem("ozs_fb_tapLvl")) || 0;
+let limitLvl = Number(localStorage.getItem("ozs_fb_limitLvl")) || 0;
+let speedLvl = Number(localStorage.getItem("ozs_fb_speedLvl")) || 0;
+let refillsLeft = Number(localStorage.getItem("ozs_fb_refills")) || 3;
+let lastSpinDate = localStorage.getItem("ozs_fb_spinDate") || "";
+let lastBonusDate = localStorage.getItem("ozs_fb_bonusDate") || "";
+let bonusStreak = Number(localStorage.getItem("ozs_fb_streak")) || 0;
+
+const limits = [1000, 2000, 4000, 8000, 10000, 100000, 999999999]; 
+const speeds = [1, 2, 5, 10, 20, 30, 40, 50, 100];
+const tapPowers = [1, 4, 12, 24, 48, 100];
+
+function save() {
+  localStorage.setItem("ozs_fb_coins", coins);
+  localStorage.setItem("ozs_fb_energy", energy);
+  localStorage.setItem("ozs_fb_tapLvl", tapLvl);
+  localStorage.setItem("ozs_fb_limitLvl", limitLvl);
+  localStorage.setItem("ozs_fb_speedLvl", speedLvl);
+  localStorage.setItem("ozs_fb_refills", refillsLeft);
+  localStorage.setItem("ozs_fb_spinDate", lastSpinDate);
+  localStorage.setItem("ozs_fb_bonusDate", lastBonusDate);
+  localStorage.setItem("ozs_fb_streak", bonusStreak);
+}
+
+// TAP HANDLER 
+const tapSurface = document.getElementById("tapSurface");
+const coinBtn = document.getElementById("coinBtn");
+
+tapSurface.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  const touches = e.changedTouches;
+  for (let i = 0; i < touches.length; i++) {
+    handleTap(touches[i].clientX, touches[i].clientY);
+  }
+}, { passive: false });
+
+tapSurface.addEventListener("mousedown", (e) => {
+  if ('ontouchstart' in window) return;
+  handleTap(e.clientX, e.clientY);
+});
+
+function handleTap(x, y) {
+  const power = tapPowers[tapLvl];
+  let actualPower = power;
+
+  if (limitLvl < 6) {
+    if (energy <= 0) {
+      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
+      return;
+    }
+    actualPower = Math.min(energy, power);
+    energy -= actualPower;
+  }
+
+  coins += actualPower;
+  showAnim(x, y, actualPower);
+  coinBtn.style.transform = "scale(0.92) translateZ(0)";
+  setTimeout(() => { coinBtn.style.transform = "scale(1) translateZ(0)"; }, 50);
+
+  if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+  updateUI();
+}
+
+function showAnim(x, y, v) {
+  const el = document.createElement("div");
+  el.className = "tap-number"; el.innerText = "+" + v;
+  el.style.left = (x - 20) + "px"; el.style.top = (y - 50) + "px";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+
+function updateUI() {
+  const maxE = limits[limitLvl];
+  document.getElementById("balance").innerText = Math.floor(coins).toLocaleString();
+  document.getElementById("energyVal").innerText = limitLvl === 6 ? "∞" : energy;
+  document.getElementById("maxEnergyVal").innerText = limitLvl === 6 ? "∞" : maxE;
+  document.getElementById("energyFill").style.width = limitLvl === 6 ? "100%" : (energy / maxE * 100) + "%";
+  
+  const usd = (coins / 1000000) * 0.25;
+  document.getElementById("usdVal").innerText = "$" + usd.toFixed(4);
+  document.getElementById("uzsVal").innerText = Math.floor(usd * 12650).toLocaleString() + " UZS";
+  
+  const today = new Date().toLocaleDateString();
+  const spinBtn = document.getElementById("spinBtn");
+  if (lastSpinDate === today) {
+    spinBtn.innerText = "ERTANGA KELING";
+    spinBtn.style.background = "#555";
+    spinBtn.disabled = true;
+  } else {
+    spinBtn.innerText = "SPIN (5,000 🪙)";
+    spinBtn.style.background = "var(--accent-gold)";
+    spinBtn.disabled = false;
+  }
+  save();
+}
+
+// BOOSTERS ENGINE
+function showTab(type) {
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + type).classList.add('active');
+  const cont = document.getElementById("boostContent");
+  cont.innerHTML = "";
+
+  if (type === 'tap') {
+    const prices = [0, 1000, 5000, 20000, 100000, 500000];
+    for (let i = 1; i < tapPowers.length; i++) {
+      cont.innerHTML += `<div class="item-card">
+        <div><p style="font-weight:700;">Multi-Tap Lvl ${i}</p><p style="font-size:12px; color:#888;">Yutuq: +${tapPowers[i]}</p></div>
+        <button class="btn-buy" onclick="buyTap(${i}, ${prices[i]})" ${tapLvl >= i ? 'disabled' : ''}>${prices[i].toLocaleString()}</button>
+      </div>`;
+    }
+  } else if (type === 'limit') {
+    const prices = [0, 2000, 10000, 50000, 250000, 1000000, 5000000];
+    for (let i = 1; i < limits.length; i++) {
+      let label = limits[i] === 999999999 ? "INFINITE (Cheksiz)" : limits[i] + "⚡";
+      cont.innerHTML += `<div class="item-card">
+        <div><p style="font-weight:700;">Limit Lvl ${i}</p><p style="font-size:12px; color:#888;">Hajm: ${label}</p></div>
+        <button class="btn-buy" onclick="buyLimit(${i}, ${prices[i]})" ${limitLvl >= i ? 'disabled' : ''}>${prices[i].toLocaleString()}</button>
+      </div>`;
+    }
+  } else if (type === 'speed') {
+    const prices = [0, 3000, 10000, 30000, 80000, 200000, 500000, 1000000, 2500000];
+    for (let i = 1; i < speeds.length; i++) {
+      cont.innerHTML += `<div class="item-card">
+        <div><p style="font-weight:700;">Recharge Lvl ${i}</p><p style="font-size:12px; color:#888;">Tezlik: +${speeds[i]}⚡/sek</p></div>
+        <button class="btn-buy" onclick="buySpeed(${i}, ${prices[i]})" ${speedLvl >= i ? 'disabled' : ''}>${prices[i].toLocaleString()}</button>
+      </div>`;
+    }
+  } else if (type === 'special') {
+    let cost = refillsLeft > 0 ? "BEPUL" : "1,000";
+    cont.innerHTML = `<div class="item-card">
+      <div><p style="font-weight:700;">Full Tank ⚡</p><p style="font-size:12px; color:#888;">Sizda ${refillsLeft} bepul bor</p></div>
+      <button class="btn-buy" onclick="useFullTank()">${cost}</button>
+    </div>`;
+  }
+}
+
+function buyTap(l, p) { if(coins>=p){ coins-=p; tapLvl=l; updateUI(); showTab('tap'); } }
+function buyLimit(l, p) { if(coins>=p){ coins-=p; limitLvl=l; updateUI(); showTab('limit'); } }
+function buySpeed(l, p) { if(coins>=p){ coins-=p; speedLvl=l; updateUI(); showTab('speed'); } }
+
+function useFullTank() {
+  let cost = refillsLeft > 0 ? 0 : 1000;
+  if (coins >= cost) {
+    coins -= cost;
+    energy = limits[limitLvl];
+    if (refillsLeft > 0) refillsLeft--;
+    tg.showAlert("⚡ Energiya to'ldirildi!");
+    updateUI();
+    showTab('special');
+  } else { tg.showAlert("Mablag' yetarli emas!"); }
+}
+
+// LUCKY SPIN LOGIC
+let spinning = false;
+function doSpin() {
+  const today = new Date().toLocaleDateString();
+  if (lastSpinDate === today) return;
+  
+  if (spinning || coins < 5000) {
+      if (coins < 5000) tg.showAlert("Aylantirish uchun 5,000 tanga kerak!");
+      return;
+  }
+  
+  coins -= 5000;
+  spinning = true;
+  lastSpinDate = today;
+  updateUI();
+
+  const deg = 1800 + Math.random() * 3600;
+  const wheel = document.getElementById("wheelSvg");
+  wheel.style.transform = `rotate(${deg}deg)`;
+
+  setTimeout(() => {
+    spinning = false;
+    const prizes = [25000, 5000, 15000, 0, 500000, 5000];
+    const win = prizes[Math.floor(Math.random() * prizes.length)];
+    coins += win;
+    tg.showAlert(win > 0 ? "Tabriklaymiz! +" + win + " 🪙" : "Bugun omad kelmadi. Ertaga urunib ko'ring!");
+    updateUI();
+  }, 4100);
+}
+
+// DAILY BONUS LOGIC
+function updateBonusUI() {
+  const today = new Date().toLocaleDateString();
+  const btn = document.getElementById("claimBonusBtn");
+  const status = document.getElementById("bonusStatus");
+  const streakTitle = document.getElementById("streakText");
+  
+  streakTitle.innerText = "Kun: " + bonusStreak;
+
+  if (lastBonusDate === today) {
+    btn.disabled = true;
+    btn.innerText = "ERTANGA KELING";
+    btn.style.background = "#333";
+    status.innerText = "Bugungi bonus olindi! 24 soatdan keyin qayting.";
+  } else {
+    btn.disabled = false;
+    btn.innerText = "BONUSNI OLISH (10,000 🪙)";
+    btn.style.background = "var(--accent-green)";
+    status.innerText = "Yangi bonus tayyor! Uni hoziroq qo'lga kiriting.";
+  }
+}
+
+function claimDailyBonus() {
+  const today = new Date().toLocaleDateString();
+  if (lastBonusDate === today) return;
+
+  bonusStreak++;
+  let reward = 10000;
+  let message = "Tabriklaymiz! 10,000 tanga olindi.";
+
+  // Har 100 kunda maxsus bonus (masalan 1,000,000 tanga)
+  if (bonusStreak % 100 === 0) {
+    reward = 1000000;
+    message = "DAHSHAT! " + bonusStreak + "-kunlik maxsus bonus: 1,000,000 tanga!";
+  }
+
+  coins += reward;
+  lastBonusDate = today;
+  
+  save();
+  updateUI();
+  updateBonusUI();
+  
+  if (tg.showAlert) {
+    tg.showAlert(message);
+  } else {
+    alert(message);
+  }
+}
+
+// AUTO ENERGY REGEN
+setInterval(() => {
+  const maxE = limits[limitLvl];
+  if (energy < maxE) {
+    energy += speeds[speedLvl];
+    if (energy > maxE) energy = maxE;
+    updateUI();
+  }
+}, 1000);
+
+// MODAL CONTROLS
+function openM(id) {
+  closeAll();
+  document.getElementById(id).classList.add("open");
+  document.getElementById("overlay").style.display = "block";
+  if (id === 'boostM') showTab('tap');
+  if (id === 'bonusM') updateBonusUI();
+}
+function closeAll() {
+  document.querySelectorAll(".modal").forEach(m => m.classList.remove("open"));
+  document.getElementById("overlay").style.display = "none";
+}
+
+window.onload = () => {
+  updateUI();
+};
+</script>
+</body>
+</html>

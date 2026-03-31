@@ -1,492 +1,718 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OZS TAP - Final Masterpiece</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>OZS Aviator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-dark: #050608;
+            --bg-card: #0d0f1a;
+            --gold: #ffcc00;
+            --green: #00ff88;
+            --red: #ff3b3b;
+            --theme: #cd7f32;
+            --border: rgba(255,204,0,0.15);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-<style>
-  :root {
-    --bg-dark: #05060a;
-    --bg-card: #121420;
-    --accent-gold: #ffcc00;
-    --accent-blue: #00d2ff;
-    --accent-green: #00ff88;
-    --text-white: #ffffff;
-  }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg-dark);
+            color: white;
+            height: 100dvh; width: 100vw;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            background-image: radial-gradient(ellipse at 50% 0%, rgba(205,127,50,0.12) 0%, transparent 65%);
+        }
 
-  * { 
-    box-sizing: border-box; 
-    user-select: none; 
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation; 
-  }
+        /* INTRO */
+        #intro {
+            position: fixed; inset: 0;
+            background: #000;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 9999;
+            animation: fadeOut 1s forwards 2.5s;
+        }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        .intro-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem; font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--gold);
+            text-shadow: 0 0 30px rgba(255,204,0,0.4);
+            animation: zoomIn 2s forwards;
+        }
+        .intro-sub { font-size: 0.75rem; letter-spacing: 8px; color: #555; margin-top: 10px; font-weight: 900; animation: fadeIn 2s 0.5s both; }
+        .intro-plane { font-size: 3rem; margin-bottom: 20px; animation: flyIn 1.5s ease-out both; }
+        @keyframes zoomIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes flyIn   { from { transform: translateX(-200px) rotate(-20deg); opacity: 0; } to { transform: translateX(0) rotate(0deg); opacity: 1; } }
 
-  body {
-    margin: 0; padding: 0;
-    font-family: 'Montserrat', sans-serif;
-    background: var(--bg-dark);
-    color: var(--text-white);
-    height: 100dvh; width: 100vw;
-    overflow: hidden;
-    display: flex; flex-direction: column;
-  }
+        /* HEADER */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px 8px;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .header-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem; font-weight: 900; color: var(--gold);
+            text-shadow: 0 0 10px rgba(255,204,0,0.4);
+        }
+        .balance-chip {
+            display: flex; align-items: center; gap: 7px;
+            background: rgba(255,204,0,0.08);
+            border: 1px solid rgba(255,204,0,0.25);
+            border-radius: 20px; padding: 6px 14px;
+        }
+        .balance-chip .coin-icon { font-size: 1rem; }
+        .balance-chip .bal-val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem; font-weight: 900; color: var(--gold);
+        }
+        .balance-chip .bal-label { font-size: 0.65rem; color: rgba(255,204,0,0.5); font-weight: 700; }
 
-  #intro {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; z-index: 9999;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    animation: fadeOut 1s forwards 1.5s;
-  }
-  @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        /* TABS */
+        .tabs {
+            display: flex; flex-shrink: 0;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1; padding: 10px 4px;
+            background: transparent; border: none;
+            color: rgba(255,255,255,0.35);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.62rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(255,204,0,0.04); }
 
-  .header { padding: env(safe-area-inset-top, 20px) 20px 5px; display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 11px; color: var(--accent-blue); }
-  
-  .score-section { text-align: center; margin-top: 1vh; }
-  .score-section h1 { font-size: 48px; margin: 0; font-weight: 900; color: var(--accent-gold); text-shadow: 0 0 25px rgba(255,204,0,0.4); }
+        /* SCROLLABLE AREA */
+        .tab-content { display: none; flex: 1; overflow-y: auto; }
+        .tab-content.active { display: flex; flex-direction: column; }
 
-  .game-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; touch-action: none; }
-  
-  .main-coin {
-    width: 75vw; height: 75vw; max-width: 320px; max-height: 320px;
-    background: radial-gradient(circle, #ffeb7a 0%, #ffcc00 50%, #b38600 100%);
-    border-radius: 50%; display: flex; justify-content: center; align-items: center;
-    box-shadow: 0 0 60px rgba(0,0,0,0.6), inset 0 0 25px rgba(255,255,255,0.7);
-    border: 8px solid #cc9900;
-    z-index: 10; font-size: 110px;
-    transition: transform 0.05s cubic-bezier(0, 0, 0.2, 1);
-  }
+        /* ============ GAME TAB ============ */
+        .last-results {
+            display: flex; align-items: center; gap: 5px;
+            padding: 8px 14px; flex-wrap: wrap;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            flex-shrink: 0;
+        }
+        .res-label { font-size: 0.65rem; color: rgba(255,255,255,0.3); font-weight: 700; letter-spacing: 1px; margin-right: 2px; }
+        .res-badge {
+            padding: 2px 8px; border-radius: 12px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.62rem; font-weight: 700;
+        }
+        .res-badge.low  { background: rgba(255,59,59,0.15);  color: #ff6b6b; border: 1px solid rgba(255,59,59,0.3); }
+        .res-badge.mid  { background: rgba(0,255,136,0.1);   color: #00ff88; border: 1px solid rgba(0,255,136,0.25); }
+        .res-badge.high { background: rgba(255,204,0,0.15);  color: var(--gold); border: 1px solid rgba(255,204,0,0.3); }
 
-  .tap-number { position: absolute; color: white; font-size: 40px; font-weight: 900; pointer-events: none; animation: floatUp 0.8s forwards; font-family: 'Orbitron'; z-index: 1000; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-  @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-200px) scale(1.3); opacity: 0; } }
+        .game-area {
+            position: relative; flex-shrink: 0;
+            height: 200px;
+            background: linear-gradient(180deg, #000015 0%, #050520 100%);
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .game-area::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at center, rgba(205,127,50,0.05) 0%, transparent 70%);
+        }
+        .grid-lines {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
 
-  .status-panel { padding: 10px 25px 25px; }
-  .bar-info { display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; margin-bottom: 6px; font-family: 'Orbitron'; }
-  .bar-bg { width: 100%; height: 15px; background: #1a1c29; border-radius: 12px; border: 1px solid #2a2d3e; overflow: hidden; }
-  .bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #00d2ff, #3a7bd5); transition: width 0.1s; }
+        #traj-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-  .navbar {
-    display: flex; justify-content: space-around; background: var(--bg-card);
-    padding: 12px 5px calc(15px + env(safe-area-inset-bottom, 0px));
-    border-radius: 25px 25px 0 0; border-top: 1px solid rgba(255,255,255,0.1);
-  }
-  .nav-btn { background: none; border: none; color: #666; font-size: 10px; font-weight: 700; flex: 1; outline: none; }
-  .nav-btn.active { color: var(--accent-blue); }
-  .nav-btn span { display: block; font-size: 24px; margin-bottom: 4px; }
+        #multi-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.2rem; font-weight: 900;
+            color: white; z-index: 2;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            transition: color 0.2s;
+        }
+        #multi-display.crashed { color: var(--red); animation: pulseRed 0.5s infinite; }
+        #multi-display.winning { color: var(--green); text-shadow: 0 0 20px rgba(0,255,136,0.4); }
 
-  .modal {
-    position: fixed; bottom: -100%; left: 0; width: 100%; height: 85dvh;
-    background: var(--bg-card); border-radius: 40px 40px 0 0;
-    z-index: 2000; transition: bottom 0.4s cubic-bezier(0.17, 0.84, 0.44, 1);
-    padding: 30px 20px; overflow-y: auto; border-top: 3px solid var(--accent-blue);
-  }
-  .modal.open { bottom: 0; }
-  .modal-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-family: 'Orbitron'; }
-  
-  .boost-tab { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-  .tab-item { background: #1a1c29; padding: 12px 20px; border-radius: 15px; font-size: 12px; white-space: nowrap; border: 1px solid #333; color: #aaa; }
-  .tab-item.active { background: var(--accent-blue); color: #000; border-color: var(--accent-blue); font-weight: 800; }
+        @keyframes pulseRed {
+            0%   { text-shadow: 0 0 10px var(--red); }
+            50%  { text-shadow: 0 0 40px var(--red), 0 0 60px rgba(255,0,0,0.4); }
+            100% { text-shadow: 0 0 10px var(--red); }
+        }
 
-  .item-card {
-    background: rgba(255,255,255,0.04); padding: 18px; border-radius: 22px;
-    margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-    border: 1px solid rgba(255,255,255,0.07);
-  }
-  .btn-buy { background: var(--accent-blue); color: #000; border: none; padding: 12px 18px; border-radius: 15px; font-weight: 900; font-size: 13px; transition: 0.3s; }
-  .btn-buy:disabled { background: #222; color: #555; }
+        #plane {
+            position: absolute; bottom: 18px; left: 18px;
+            font-size: 2rem; z-index: 3;
+            transition: all 0.08s;
+            filter: drop-shadow(0 0 8px rgba(255,204,0,0.5));
+        }
 
-  .wheel-container {
-    width: 280px; height: 280px; margin: 10px auto 30px; position: relative;
-    border: 12px solid #1a1c29; border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.5);
-  }
-  .wheel-svg { width: 100%; height: 100%; transition: transform 4s cubic-bezier(0.15, 0, 0.1, 1); }
-  .wheel-pointer {
-    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-    width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
-    border-top: 30px solid #ff4444; z-index: 10;
-  }
+        .crashed-txt {
+            position: absolute; top: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem; color: var(--red); font-weight: 900;
+            display: none; z-index: 4; letter-spacing: 3px;
+            text-shadow: 0 0 20px var(--red);
+        }
+        .waiting-txt {
+            position: absolute; bottom: 8px;
+            font-size: 0.7rem; color: rgba(255,255,255,0.3);
+            letter-spacing: 2px; z-index: 4; display: none;
+        }
 
-  #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1500; }
-</style>
+        .controls {
+            padding: 14px 14px 8px;
+            display: flex; flex-direction: column; gap: 10px;
+            background: rgba(0,0,0,0.15); flex-shrink: 0;
+        }
+        .quick-bets { display: flex; gap: 6px; }
+        .qb {
+            flex: 1; padding: 7px 4px;
+            background: rgba(255,204,0,0.07);
+            border: 1px solid rgba(255,204,0,0.2);
+            border-radius: 8px; color: var(--gold);
+            font-family: 'Orbitron', sans-serif; font-size: 0.65rem; font-weight: 700;
+            cursor: pointer; transition: all 0.15s; text-align: center;
+        }
+        .qb:hover { background: rgba(255,204,0,0.18); transform: translateY(-1px); }
+
+        .input-row {
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,204,0,0.2);
+            border-radius: 10px; padding: 10px 14px; gap: 8px;
+        }
+        .input-row .lbl { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: var(--gold); font-weight: 700; }
+        .input-row input {
+            flex: 1; background: transparent; border: none;
+            color: white; font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem; font-weight: 700; outline: none;
+        }
+        .coin-badge { font-size: 0.7rem; color: rgba(255,204,0,0.5); font-weight: 700; background: rgba(255,204,0,0.08); border-radius: 6px; padding: 2px 7px; }
+
+        .btn {
+            padding: 13px; font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem; font-weight: 700; border: none;
+            border-radius: 10px; cursor: pointer;
+            text-transform: uppercase; transition: all 0.2s; letter-spacing: 1px;
+        }
+        .btn-bet {
+            background: linear-gradient(135deg, #1a6e2e, #25a244);
+            color: white; box-shadow: 0 4px 20px rgba(37,162,68,0.35);
+        }
+        .btn-bet:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(37,162,68,0.5); }
+        .btn-cashout {
+            background: linear-gradient(135deg, #a87800, #ffcc00);
+            color: #000; display: none;
+            animation: pulseCashout 1s infinite alternate;
+        }
+        @keyframes pulseCashout {
+            from { box-shadow: 0 4px 15px rgba(255,204,0,0.3); }
+            to   { box-shadow: 0 4px 30px rgba(255,204,0,0.7); }
+        }
+        .btn:disabled { background: #1a1a2e; color: #444; box-shadow: none; cursor: not-allowed; animation: none; }
+
+        /* ============ HISTORY TAB ============ */
+        .section-pad { padding: 16px; }
+        .sec-title { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: var(--gold); letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+        .hist-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px; padding: 11px 13px; margin-bottom: 8px;
+            animation: slideIn 0.3s ease both;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+        .hist-item.win  { border-color: rgba(0,255,136,0.18); }
+        .hist-item.loss { border-color: rgba(255,59,59,0.12); }
+        .hist-left { display: flex; flex-direction: column; gap: 2px; }
+        .hist-bet  { font-size: 0.72rem; color: rgba(255,255,255,0.45); }
+        .hist-mult { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 700; }
+        .hist-mult.c  { color: var(--green); }
+        .hist-mult.cr { color: var(--red); }
+        .hist-time { font-size: 0.63rem; color: rgba(255,255,255,0.25); }
+        .hist-res  { font-family: 'Orbitron', sans-serif; font-size: 0.82rem; font-weight: 700; }
+        .hist-res.win  { color: var(--green); }
+        .hist-res.loss { color: var(--red); }
+        .empty-msg { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.2); font-size: 0.85rem; line-height: 2; }
+
+        /* ============ STATS TAB ============ */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,204,0,0.12); border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-val { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--gold); font-weight: 700; }
+        .stat-lbl { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 5px; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* ============ REFERRAL TAB ============ */
+        .ref-hero { margin: 16px 16px 12px; background: linear-gradient(135deg, rgba(255,204,0,0.07), rgba(100,0,200,0.07)); border: 1px solid rgba(255,204,0,0.2); border-radius: 14px; padding: 18px; text-align: center; }
+        .ref-hero-icon  { font-size: 2rem; margin-bottom: 8px; }
+        .ref-hero-title { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--gold); margin-bottom: 6px; }
+        .ref-hero-desc  { font-size: 0.78rem; color: rgba(255,255,255,0.55); line-height: 1.6; }
+        .ref-hero-desc b { color: var(--green); }
+
+        .ref-code-box { margin: 0 16px 12px; background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,204,0,0.4); border-radius: 10px; padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; }
+        .ref-code-val { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--gold); letter-spacing: 3px; font-weight: 700; }
+        .btn-copy { background: rgba(255,204,0,0.12); border: 1px solid rgba(255,204,0,0.35); color: var(--gold); border-radius: 8px; padding: 7px 13px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.78rem; transition: all 0.2s; }
+        .btn-copy:hover  { background: rgba(255,204,0,0.25); }
+        .btn-copy.copied { background: rgba(0,255,136,0.15); border-color: var(--green); color: var(--green); }
+
+        .ref-stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px 14px; }
+        .ref-stat-c { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 13px; text-align: center; }
+        .ref-stat-v { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--gold); font-weight: 700; }
+        .ref-stat-l { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 4px; }
+
+        .enter-ref-box { margin: 0 16px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; }
+        .enter-ref-lbl { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-bottom: 10px; font-weight: 700; }
+        .enter-ref-row { display: flex; gap: 8px; }
+        .enter-ref-row input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,204,0,0.2); border-radius: 8px; padding: 10px 12px; color: white; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; outline: none; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-apply { background: linear-gradient(135deg, #1a6e2e, #25a244); color: white; border: none; border-radius: 8px; padding: 10px 14px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
+        .ref-msg { margin-top: 9px; font-size: 0.75rem; display: none; animation: fadeIn 0.3s; }
+
+        /* INFO BOX */
+        .info-box { margin: 0 16px 16px; background: rgba(255,204,0,0.05); border: 1px solid rgba(255,204,0,0.15); border-radius: 12px; padding: 14px; }
+        .info-box p { font-size: 0.75rem; color: rgba(255,255,255,0.55); line-height: 1.7; }
+        .info-box b { color: var(--gold); }
+
+        /* NOTIF POP */
+        .notif-pop {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px);
+            background: #0d0f1a; border: 1px solid var(--gold);
+            padding: 12px 22px; border-radius: 20px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.78rem; font-weight: 900;
+            color: var(--gold); z-index: 9000;
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 0 25px rgba(255,204,0,0.3); white-space: nowrap;
+        }
+        .notif-pop.show { transform: translateX(-50%) translateY(0); }
+    </style>
 </head>
 <body>
 
+<!-- INTRO -->
 <div id="intro">
-  <div style="font-family:'Orbitron'; font-size:60px; color:var(--accent-blue); text-shadow: 0 0 20px var(--accent-blue);">OZS</div>
-  <p style="letter-spacing:8px; font-size:12px; color:#666; font-weight:bold;">FINAL BALANCED</p>
+    <div class="intro-plane">✈️</div>
+    <div class="intro-logo">OZS STUDIO</div>
+    <div class="intro-sub">AVIATOR</div>
 </div>
 
+<!-- NOTIF -->
+<div class="notif-pop" id="notifPop">+5,000 🪙</div>
+
+<!-- HEADER -->
 <div class="header">
-  <div>PLAYER: <span id="userDisplay" style="color:white">SAIDOV て</span></div>
-  <div style="letter-spacing: 2px;">OZS STUDIO PRO</div>
-</div>
-
-<div class="score-section">
-  <p style="margin:0; opacity:0.4; font-size:12px; font-weight:700;">TOTAL ASSETS</p>
-  <h1>🪙 <span id="balance">0</span></h1>
-</div>
-
-<div class="game-container" id="tapSurface">
-  <div class="main-coin" id="coinBtn">🪙</div>
-</div>
-
-<div class="status-panel">
-  <div class="bar-info">
-    <span>⚡ ENERGY</span>
-    <span><span id="energyVal">1000</span> / <span id="maxEnergyVal">1000</span></span>
-  </div>
-  <div class="bar-bg"><div class="bar-fill" id="energyFill"></div></div>
-</div>
-
-<div class="navbar">
-  <button class="nav-btn" onclick="openM('boostM')"><span>🚀</span>Boosters</button>
-  <button class="nav-btn" onclick="openM('luckyM')"><span>🎡</span>Lucky</button>
-  <button class="nav-btn" onclick="openM('bonusM')"><span>🎁</span>Bonus</button>
-  <button class="nav-btn" onclick="openM('walletM')"><span>💰</span>Wallet</button>
-</div>
-
-<div id="overlay" onclick="closeAll()"></div>
-
-<div id="boostM" class="modal">
-  <div class="modal-h"><h3>Upgrades</h3><span onclick="closeAll()" style="font-size:28px;">✕</span></div>
-  <div class="boost-tab">
-    <div id="tab-tap" class="tab-item active" onclick="showTab('tap')">Tap Power</div>
-    <div id="tab-limit" class="tab-item" onclick="showTab('limit')">Energy Limit</div>
-    <div id="tab-speed" class="tab-item" onclick="showTab('speed')">Recharge</div>
-    <div id="tab-special" class="tab-item" onclick="showTab('special')">Special</div>
-  </div>
-  <div id="boostContent"></div>
-</div>
-
-<div id="luckyM" class="modal">
-  <div class="modal-h"><h3>Lucky Wheel</h3><span onclick="closeAll()">✕</span></div>
-  <div class="wheel-container">
-    <div class="wheel-pointer"></div>
-    <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="48" fill="#121420" stroke="#ffcc00" stroke-width="2"/>
-      <path d="M50 50 L50 2 A48 48 0 0 1 92 26 Z" fill="#ffcc00"/>
-      <path d="M50 50 L92 26 A48 48 0 0 1 92 74 Z" fill="#00d2ff"/>
-      <path d="M50 50 L92 74 A48 48 0 0 1 50 98 Z" fill="#ffcc00"/>
-      <path d="M50 50 L50 98 A48 48 0 0 1 8 74 Z" fill="#00d2ff"/>
-      <path d="M50 50 L8 74 A48 48 0 0 1 8 26 Z" fill="#ffcc00"/>
-      <path d="M50 50 L8 26 A48 48 0 0 1 50 2 Z" fill="#00d2ff"/>
-      <circle cx="50" cy="50" r="5" fill="white"/>
-    </svg>
-  </div>
-  <button id="spinBtn" class="btn-buy" style="width:100%; height:65px; font-size:20px;" onclick="doSpin()">SPIN (5,000 🪙)</button>
-  <div style="margin-top:20px; background:rgba(0,0,0,0.2); padding:15px; border-radius:20px; font-size:13px;">
-    <p>🎁 Yutuqlar: <b>500,000 / 25,000 / 15,000 / 5,000 / 0</b></p>
-  </div>
-</div>
-
-<div id="bonusM" class="modal">
-    <div class="modal-h"><h3>Kunlik Bonus</h3><span onclick="closeAll()">✕</span></div>
-    <div style="text-align:center; padding: 10px;">
-      <div id="bonusIcon" style="font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent-gold));">🎁</div>
-      <h2 id="streakText" style="color: var(--accent-gold); font-family: 'Orbitron'; margin: 5px 0;">Kun: 0</h2>
-      <p id="bonusStatus" style="opacity: 0.7; font-size: 14px; min-height: 40px;">Yuklanmoqda...</p>
-      
-      <button id="claimBonusBtn" class="btn-buy" style="width:100%; height:65px; font-size:18px; margin-top: 15px;" onclick="claimDailyBonus()">
-        BONUSNI OLISH (10,000 🪙)
-      </button>
-      
-      <div style="margin-top:25px; font-size:12px; color:#888; border-top: 1px solid #333; padding-top: 15px; line-height: 1.6;">
-        * Har kuni 10,000 tanga sovg'a! <br>
-        * Har <b>100 kun</b>da 10,000 o'rniga maxsus yutuq!
-      </div>
+    <div class="header-logo">✈ AVIATOR</div>
+    <div class="balance-chip">
+        <span class="coin-icon">🪙</span>
+        <div>
+            <div class="bal-val" id="bal-display">0</div>
+            <div class="bal-label">OZS COIN</div>
+        </div>
     </div>
 </div>
 
-<div id="walletM" class="modal">
-  <div class="modal-h"><h3>Hamyon</h3><span onclick="closeAll()">✕</span></div>
-  <div style="background:linear-gradient(135deg, #1e2548, #0a0c1a); padding:35px; border-radius:30px; border:1px solid #2a2d3e; text-align:center;">
-    <p style="font-size:13px; opacity:0.6; margin:0; letter-spacing:1px;">MY ASSETS VALUE</p>
-    <h1 id="usdVal" style="margin:12px 0; color:var(--accent-blue); font-family:'Orbitron'; font-size:35px;">$0.0000</h1>
-    <h3 id="uzsVal" style="margin:0; opacity:0.9; font-weight:400; color:var(--accent-green);">0 UZS</h3>
-  </div>
-  <div style="margin-top:25px; padding:15px; background:rgba(255,255,255,0.03); border-radius:15px; font-size:12px; color:#888;">
-    * 1M Coins = $0.25 <br>
-    * Chiqarish: Minimal $10.00
-  </div>
+<!-- TABS -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('game',this)">O'YIN</button>
+    <button class="tab-btn"        onclick="switchTab('history',this)">TARIX</button>
+    <button class="tab-btn"        onclick="switchTab('stats',this)">STATISTIKA</button>
+    <button class="tab-btn"        onclick="switchTab('referral',this)">REFERAL</button>
 </div>
 
-<div id="infoM" class="modal">
-  <div class="modal-h"><h3>Aloqa</h3><span onclick="closeAll()">✕</span></div>
-  <p style="opacity:0.6; margin-bottom:20px;">Savollar va takliflar uchun administrator bilan bog'laning:</p>
-  <a href="https://instagram.com/0zodbek.saidov" target="_blank" class="item-card" style="text-decoration:none; color:white; background: linear-gradient(45deg, #f09433, #dc2743);">
-    <div><p style="font-weight:700;">Saidov て (Developer)</p><p style="font-size:12px; color:white; opacity:0.8;">@0zodbek.saidov</p></div>
-    <span style="font-size:24px;">📸</span>
-  </a>
+<!-- ====== GAME TAB ====== -->
+<div id="tab-game" class="tab-content active">
+    <div class="last-results" id="last-results">
+        <span class="res-label">OXIRGI:</span>
+    </div>
+    <div class="game-area">
+        <div class="grid-lines"></div>
+        <svg id="traj-svg" viewBox="0 0 380 200" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="trajGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:rgba(255,204,0,0);stop-opacity:0"/>
+                    <stop offset="100%" style="stop-color:rgba(255,204,0,0.5);stop-opacity:1"/>
+                </linearGradient>
+            </defs>
+            <path id="traj-path" d="" fill="none" stroke="url(#trajGrad)" stroke-width="1.5"/>
+        </svg>
+        <div class="crashed-txt" id="crashed-txt">UCHIB KETDI!</div>
+        <div id="multi-display">1.00x</div>
+        <div id="plane">🚀</div>
+        <div class="waiting-txt" id="waiting-txt">⏳ Navbatdagi parvoz...</div>
+    </div>
+    <div class="controls">
+        <div class="quick-bets">
+            <button class="qb" onclick="setQB(1000)">1K</button>
+            <button class="qb" onclick="setQB(5000)">5K</button>
+            <button class="qb" onclick="setQB(10000)">10K</button>
+            <button class="qb" onclick="setQB(50000)">50K</button>
+            <button class="qb" onclick="setQB(100000)">100K</button>
+        </div>
+        <div class="input-row">
+            <span class="lbl">TIK:</span>
+            <input type="number" id="bet-input" value="1000" min="100" step="100">
+            <span class="coin-badge">🪙 OZS</span>
+        </div>
+        <button class="btn btn-bet"     id="bet-btn">🎯 TIKISH</button>
+        <button class="btn btn-cashout" id="cashout-btn">💸 YECHISH</button>
+    </div>
+</div>
+
+<!-- ====== HISTORY TAB ====== -->
+<div id="tab-history" class="tab-content">
+    <div class="section-pad">
+        <div class="sec-title">📊 O'YIN TARIXI</div>
+        <div id="hist-list">
+            <div class="empty-msg">🕹️ Hali o'yinlar yo'q<br><span style="font-size:0.75rem;">Birinchi tikishni qiling!</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ====== STATS TAB ====== -->
+<div id="tab-stats" class="tab-content">
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="st-coins">0</div><div class="stat-lbl">JORIY BALANS 🪙</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-games">0</div><div class="stat-lbl">O'YINLAR SONI</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-wins">0</div><div class="stat-lbl">YUTUQLAR ✅</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-best">-</div><div class="stat-lbl">ENG YAXSHI x</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-won">0</div><div class="stat-lbl">YUTILGAN 🪙</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-lost">0</div><div class="stat-lbl">YUTQAZILGAN 🪙</div></div>
+    </div>
+</div>
+
+<!-- ====== REFERRAL TAB ====== -->
+<div id="tab-referral" class="tab-content">
+    <div class="ref-hero">
+        <div class="ref-hero-icon">🤝</div>
+        <div class="ref-hero-title">DO'STLARNI TAKLIF QILING</div>
+        <div class="ref-hero-desc">
+            Har bir do'stingiz uchun <b>+10,000 OZS Coin</b> bonus!<br>
+            Do'stingiz ham <b>+5,000 OZS Coin</b> oladi.
+        </div>
+    </div>
+    <div class="sec-title" style="padding:0 16px; margin-bottom:10px;">🔗 SIZNING KODINGIZ</div>
+    <div class="ref-code-box">
+        <div class="ref-code-val" id="my-ref-code">OZS-XXXX</div>
+        <button class="btn-copy" id="copy-btn" onclick="copyCode()">Nusxa</button>
+    </div>
+    <div class="ref-stats-row">
+        <div class="ref-stat-c"><div class="ref-stat-v" id="ref-cnt">0</div><div class="ref-stat-l">Taklif qilinganlar</div></div>
+        <div class="ref-stat-c"><div class="ref-stat-v" id="ref-earned">0</div><div class="ref-stat-l">Referal daromad 🪙</div></div>
+    </div>
+    <div class="enter-ref-box">
+        <div class="enter-ref-lbl">Do'stingiz kodini kiriting:</div>
+        <div class="enter-ref-row">
+            <input type="text" id="ref-inp" placeholder="OZS-XXXX" maxlength="8">
+            <button class="btn-apply" onclick="applyRef()">Qo'llash</button>
+        </div>
+        <div class="ref-msg" id="ref-msg"></div>
+    </div>
+    <div class="info-box">
+        <p>💡 <b>OZS Coin</b> bu ilova va <b>OZS TAP</b> o'yini o'rtasida umumiy hisobdir. OZS TAP'da yig'gan tangalaringiz bu yerda ham ko'rinadi!</p>
+    </div>
 </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-if(tg) { tg.expand(); tg.enableClosingConfirmation(); }
+// ============ TELEGRAM ============
+const tg = window.Telegram?.WebApp || {
+    expand:()=>{}, enableClosingConfirmation:()=>{},
+    initDataUnsafe:{user:{first_name:"Gamer"}},
+    showAlert:(m)=>alert(m),
+    HapticFeedback:{impactOccurred:()=>{},notificationOccurred:()=>{}}
+};
+tg.expand();
 
-// GAME STATE
-let coins = Number(localStorage.getItem("ozs_fb_coins")) || 0;
-let energy = Number(localStorage.getItem("ozs_fb_energy")) || 1000;
-let tapLvl = Number(localStorage.getItem("ozs_fb_tapLvl")) || 0;
-let limitLvl = Number(localStorage.getItem("ozs_fb_limitLvl")) || 0;
-let speedLvl = Number(localStorage.getItem("ozs_fb_speedLvl")) || 0;
-let refillsLeft = Number(localStorage.getItem("ozs_fb_refills")) || 3;
-let lastSpinDate = localStorage.getItem("ozs_fb_spinDate") || "";
-let lastBonusDate = localStorage.getItem("ozs_fb_bonusDate") || "";
-let bonusStreak = Number(localStorage.getItem("ozs_fb_streak")) || 0;
-
-const limits = [1000, 2000, 4000, 8000, 10000, 100000, 999999999]; 
-const speeds = [1, 2, 5, 10, 20, 30, 40, 50, 100];
-const tapPowers = [1, 4, 12, 24, 48, 100];
-
-function save() {
-  localStorage.setItem("ozs_fb_coins", coins);
-  localStorage.setItem("ozs_fb_energy", energy);
-  localStorage.setItem("ozs_fb_tapLvl", tapLvl);
-  localStorage.setItem("ozs_fb_limitLvl", limitLvl);
-  localStorage.setItem("ozs_fb_speedLvl", speedLvl);
-  localStorage.setItem("ozs_fb_refills", refillsLeft);
-  localStorage.setItem("ozs_fb_spinDate", lastSpinDate);
-  localStorage.setItem("ozs_fb_bonusDate", lastBonusDate);
-  localStorage.setItem("ozs_fb_streak", bonusStreak);
+// ============================================================
+// MUHIM: OZS TAP bilan umumiy kalit — "ozs_f_coins"
+// Bu kalit OZS TAP ilovasidagi localStorage kaliti bilan bir xil
+// Ikki ilova bir xil Telegram Mini App domenida bo'lsa ishlaydi
+// ============================================================
+function getCoins()    { return Number(localStorage.getItem("ozs_f_coins")) || 0; }
+function getTotal()    { return Number(localStorage.getItem("ozs_f_totalCoins")) || getCoins(); }
+function setCoins(v)   {
+    const safe = Math.max(0, Math.floor(v));
+    localStorage.setItem("ozs_f_coins", safe);
+    // totalCoins hech qachon kamaymasin
+    if (safe > getTotal()) localStorage.setItem("ozs_f_totalCoins", safe);
 }
 
-// TAP HANDLER 
-const tapSurface = document.getElementById("tapSurface");
-const coinBtn = document.getElementById("coinBtn");
+// ============ AVIATOR STATE (alohida kalit) ============
+let A = JSON.parse(localStorage.getItem("ozs_avi") || "null") || {
+    history: [], lastResults: [],
+    refCode: "OZS-" + Math.random().toString(36).substr(2,4).toUpperCase(),
+    refCount: 0, refEarned: 0, refApplied: false,
+    s: { games:0, wins:0, bestMult:0, totalWon:0, totalLost:0 }
+};
+function saveA() { localStorage.setItem("ozs_avi", JSON.stringify(A)); }
 
-tapSurface.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  const touches = e.changedTouches;
-  for (let i = 0; i < touches.length; i++) {
-    handleTap(touches[i].clientX, touches[i].clientY);
-  }
-}, { passive: false });
+// ============ GAME STATE ============
+let isFlying=false, currentBet=0, multiplier=1, crashPoint=0;
+let gameInterval, planeX=0, planeY=0, pathPoints=[];
 
-tapSurface.addEventListener("mousedown", (e) => {
-  if ('ontouchstart' in window) return;
-  handleTap(e.clientX, e.clientY);
+// ============ DOM ============
+const $bal     = document.getElementById("bal-display");
+const $multi   = document.getElementById("multi-display");
+const $plane   = document.getElementById("plane");
+const $crashed = document.getElementById("crashed-txt");
+const $waiting = document.getElementById("waiting-txt");
+const $traj    = document.getElementById("traj-path");
+const $betBtn  = document.getElementById("bet-btn");
+const $cashBtn = document.getElementById("cashout-btn");
+const $betInp  = document.getElementById("bet-input");
+
+// ============ INIT ============
+function init() {
+    updateBal();
+    document.getElementById("my-ref-code").textContent = A.refCode;
+    document.getElementById("ref-cnt").textContent     = A.refCount;
+    document.getElementById("ref-earned").textContent  = A.refEarned.toLocaleString();
+    renderLastResults(); renderHistory();
+}
+init();
+
+function updateBal() {
+    $bal.textContent = getCoins().toLocaleString("ru-RU");
+}
+
+// ============ NOTIF ============
+function notif(txt, clr) {
+    const n = document.getElementById("notifPop");
+    n.textContent = txt;
+    n.style.borderColor = clr || "var(--gold)";
+    n.style.color = clr || "var(--gold)";
+    n.classList.add("show");
+    setTimeout(() => n.classList.remove("show"), 2800);
+}
+
+// ============ TABS ============
+function switchTab(name, btn) {
+    document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("tab-" + name).classList.add("active");
+    btn.classList.add("active");
+    if (name === "stats")   updateStats();
+    if (name === "history") renderHistory();
+}
+
+function setQB(v) { $betInp.value = v; }
+
+// ============ RENDER LAST RESULTS ============
+function renderLastResults() {
+    const el = document.getElementById("last-results");
+    el.innerHTML = '<span class="res-label">OXIRGI:</span>';
+    A.lastResults.slice(-8).forEach(r => {
+        const b = document.createElement("div");
+        b.className = "res-badge " + (r < 1.5 ? "low" : r < 3 ? "mid" : "high");
+        b.textContent = r.toFixed(2) + "x";
+        el.appendChild(b);
+    });
+}
+
+// ============ RENDER HISTORY ============
+function renderHistory() {
+    const list = document.getElementById("hist-list");
+    if (!A.history.length) {
+        list.innerHTML = '<div class="empty-msg">🕹️ Hali o\'yinlar yo\'q<br><span style="font-size:0.75rem;">Birinchi tikishni qiling!</span></div>';
+        return;
+    }
+    list.innerHTML = "";
+    [...A.history].reverse().forEach((h, i) => {
+        const d = document.createElement("div");
+        d.className = "hist-item " + (h.won ? "win" : "loss");
+        d.style.animationDelay = (i * 0.04) + "s";
+        d.innerHTML = `
+            <div class="hist-left">
+                <div class="hist-bet">Tikish: ${h.bet.toLocaleString()} 🪙</div>
+                <div class="hist-mult ${h.cashout ? 'c' : 'cr'}">${h.cashout ? "✅ "+h.cm.toFixed(2)+"x" : "💥 "+h.crm.toFixed(2)+"x"}</div>
+                <div class="hist-time">${h.time}</div>
+            </div>
+            <div class="hist-res ${h.won ? 'win' : 'loss'}">${h.won ? "+"+h.profit.toLocaleString() : "-"+h.bet.toLocaleString()} 🪙</div>
+        `;
+        list.appendChild(d);
+    });
+}
+
+// ============ STATS ============
+function updateStats() {
+    const s = A.s;
+    document.getElementById("st-coins").textContent = getCoins().toLocaleString("ru-RU");
+    document.getElementById("st-games").textContent = s.games;
+    document.getElementById("st-wins").textContent  = s.wins;
+    document.getElementById("st-best").textContent  = s.bestMult > 0 ? s.bestMult.toFixed(2)+"x" : "-";
+    document.getElementById("st-won").textContent   = s.totalWon.toLocaleString();
+    document.getElementById("st-lost").textContent  = s.totalLost.toLocaleString();
+}
+
+// ============ REFERRAL ============
+function copyCode() {
+    navigator.clipboard.writeText(A.refCode).catch(()=>{});
+    const btn = document.getElementById("copy-btn");
+    btn.textContent = "✅ Nusxalandi"; btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Nusxa"; btn.classList.remove("copied"); }, 2000);
+}
+
+function applyRef() {
+    const code = document.getElementById("ref-inp").value.trim().toUpperCase();
+    const msg  = document.getElementById("ref-msg");
+    if (A.refApplied) {
+        msg.style.color = "var(--red)"; msg.textContent = "❌ Allaqachon ishlatgansiz!";
+    } else if (!code.startsWith("OZS-") || code.length < 8) {
+        msg.style.color = "var(--red)"; msg.textContent = "❌ Noto'g'ri format! OZS-XXXX";
+    } else if (code === A.refCode) {
+        msg.style.color = "var(--red)"; msg.textContent = "❌ O'z kodingizdan foydalana olmaysiz!";
+    } else {
+        setCoins(getCoins() + 5000);
+        updateBal();
+        A.refApplied = true; A.refCount++; A.refEarned += 10000;
+        document.getElementById("ref-cnt").textContent    = A.refCount;
+        document.getElementById("ref-earned").textContent = A.refEarned.toLocaleString();
+        saveA();
+        msg.style.color = "var(--green)"; msg.textContent = "✅ +5,000 OZS Coin berildi!";
+        notif("🎁 +5,000 OZS Coin!", "var(--green)");
+        document.getElementById("ref-inp").value = "";
+    }
+    msg.style.display = "block";
+}
+
+// ============ CRASH GENERATOR ============
+function genCrash() {
+    const r = Math.random();
+    if (r < 0.50) return Math.random() * 0.49 + 1.01;
+    if (r < 0.80) return Math.random() * 0.99 + 1.50;
+    return Math.random() * 5.00 + 2.50;
+}
+
+// ============ BET ============
+$betBtn.addEventListener("click", () => {
+    const bet = parseFloat($betInp.value);
+    const bal = getCoins();
+    if (!bet || bet < 100)    { notif("⚠️ Minimal: 100 OZS Coin", "var(--red)"); return; }
+    if (bet > bal)            { notif("⚠️ OZS Coin yetarli emas!", "var(--red)"); return; }
+
+    setCoins(bal - bet);
+    updateBal();
+    currentBet = bet;
+
+    $betBtn.style.display = "none";
+    $cashBtn.style.display = "block";
+    $cashBtn.textContent = "⏳ Tayyorlanmoqda...";
+    $cashBtn.disabled = true;
+    $betInp.disabled  = true;
+
+    resetUI();
+    setTimeout(startGame, 1200);
+    if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
 });
 
-function handleTap(x, y) {
-  const power = tapPowers[tapLvl];
-  let actualPower = power;
+// ============ CASHOUT ============
+$cashBtn.addEventListener("click", () => {
+    if (!isFlying) return;
+    const win    = Math.floor(currentBet * multiplier);
+    const profit = win - currentBet;
+    setCoins(getCoins() + win);
+    updateBal();
+    isFlying = false;
 
-  if (limitLvl < 6) {
-    if (energy <= 0) {
-      if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
-      return;
+    $multi.classList.remove("crashed"); $multi.classList.add("winning");
+    $cashBtn.disabled = true;
+    $cashBtn.style.animation = "none";
+    $cashBtn.textContent = "✅ " + win.toLocaleString() + " OZS Coin";
+    $cashBtn.style.background = "linear-gradient(135deg,#1a6e2e,#25a244)";
+
+    notif("💰 +" + win.toLocaleString() + " 🪙", "var(--green)");
+    if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+
+    A.s.wins++; A.s.totalWon += profit;
+    if (multiplier > A.s.bestMult) A.s.bestMult = parseFloat(multiplier.toFixed(2));
+    addHist({ bet:currentBet, cashout:true, cm:multiplier, crm:null, profit, won:true, time:new Date().toLocaleTimeString("uz") });
+});
+
+// ============ GAME ============
+function startGame() {
+    isFlying=true; crashPoint=genCrash(); multiplier=1.00; pathPoints=[];
+    $cashBtn.disabled=false; $cashBtn.textContent="💸 YECHISH";
+    $cashBtn.style.background=""; $cashBtn.style.animation="";
+    $crashed.style.display="none"; $waiting.style.display="none";
+    $multi.classList.remove("crashed","winning");
+    A.s.games++;
+    let st = Date.now();
+
+    gameInterval = setInterval(() => {
+        let elapsed = (Date.now()-st)/1000;
+        multiplier += 0.005 + elapsed*0.001;
+        planeX = Math.min(planeX+1.1, 310);
+        planeY = Math.min(planeY+0.65, 150);
+        $plane.style.transform = `translate(${planeX}px,-${planeY}px) rotate(-${Math.min(planeY/3,28)}deg)`;
+
+        const sx = (planeX/340)*380, sy = 200-(planeY/155)*195;
+        pathPoints.push([sx,sy]);
+        if (pathPoints.length>1) $traj.setAttribute("d","M "+pathPoints.map(p=>p.join(" ")).join(" L "));
+
+        if (!isFlying) return;
+
+        if (multiplier >= crashPoint) { clearInterval(gameInterval); crashGame(false); }
+        else {
+            $multi.textContent = multiplier.toFixed(2)+"x";
+            $cashBtn.textContent = "💸 YECHISH "+Math.floor(currentBet*multiplier).toLocaleString()+" 🪙";
+        }
+    }, 50);
+}
+
+function crashGame(cashed) {
+    clearInterval(gameInterval); isFlying=false;
+    $multi.textContent = crashPoint.toFixed(2)+"x";
+
+    if (!cashed) {
+        $multi.classList.add("crashed"); $crashed.style.display="block";
+        $cashBtn.textContent="💥 Yutqazdingiz"; $cashBtn.style.background="#5a0000"; $cashBtn.style.animation="none";
+        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
+        A.s.totalLost += currentBet;
+        addHist({ bet:currentBet, cashout:false, cm:null, crm:crashPoint, profit:0, won:false, time:new Date().toLocaleTimeString("uz") });
     }
-    actualPower = Math.min(energy, power);
-    energy -= actualPower;
-  }
 
-  coins += actualPower;
-  showAnim(x, y, actualPower);
-  coinBtn.style.transform = "scale(0.92) translateZ(0)";
-  setTimeout(() => { coinBtn.style.transform = "scale(1) translateZ(0)"; }, 50);
+    $plane.style.transform="translate(340px,-190px) rotate(45deg)"; $plane.style.opacity="0";
+    $traj.setAttribute("d",""); $cashBtn.disabled=true;
 
-  if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-  updateUI();
+    A.lastResults.push(parseFloat(crashPoint.toFixed(2)));
+    if (A.lastResults.length>10) A.lastResults.shift();
+    renderLastResults(); saveA();
+
+    setTimeout(() => {
+        $betBtn.style.display="block"; $cashBtn.style.display="none";
+        $cashBtn.style.background=""; $betInp.disabled=false;
+        $waiting.style.display="block";
+    }, 2800);
 }
 
-function showAnim(x, y, v) {
-  const el = document.createElement("div");
-  el.className = "tap-number"; el.innerText = "+" + v;
-  el.style.left = (x - 20) + "px"; el.style.top = (y - 50) + "px";
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 800);
+function resetUI() {
+    $multi.textContent="1.00x"; $multi.classList.remove("crashed","winning");
+    $crashed.style.display="none"; $waiting.style.display="none";
+    $plane.style.transition="none"; $plane.style.transform="translate(0,0) rotate(0deg)"; $plane.style.opacity="1";
+    planeX=0; planeY=0; $traj.setAttribute("d","");
+    setTimeout(()=>{ $plane.style.transition="all 0.08s"; },50);
 }
 
-function updateUI() {
-  const maxE = limits[limitLvl];
-  document.getElementById("balance").innerText = Math.floor(coins).toLocaleString();
-  document.getElementById("energyVal").innerText = limitLvl === 6 ? "∞" : energy;
-  document.getElementById("maxEnergyVal").innerText = limitLvl === 6 ? "∞" : maxE;
-  document.getElementById("energyFill").style.width = limitLvl === 6 ? "100%" : (energy / maxE * 100) + "%";
-  
-  const usd = (coins / 1000000) * 0.25;
-  document.getElementById("usdVal").innerText = "$" + usd.toFixed(4);
-  document.getElementById("uzsVal").innerText = Math.floor(usd * 12650).toLocaleString() + " UZS";
-  
-  const today = new Date().toLocaleDateString();
-  const spinBtn = document.getElementById("spinBtn");
-  if (lastSpinDate === today) {
-    spinBtn.innerText = "ERTANGA KELING";
-    spinBtn.style.background = "#555";
-    spinBtn.disabled = true;
-  } else {
-    spinBtn.innerText = "SPIN (5,000 🪙)";
-    spinBtn.style.background = "var(--accent-gold)";
-    spinBtn.disabled = false;
-  }
-  save();
+function addHist(entry) {
+    A.history.push(entry);
+    if (A.history.length>50) A.history.shift();
+    renderHistory(); saveA();
 }
 
-// BOOSTERS ENGINE
-function showTab(type) {
-  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + type).classList.add('active');
-  const cont = document.getElementById("boostContent");
-  cont.innerHTML = "";
-
-  if (type === 'tap') {
-    const prices = [0, 1000, 5000, 20000, 100000, 500000];
-    for (let i = 1; i < tapPowers.length; i++) {
-      cont.innerHTML += `<div class="item-card">
-        <div><p style="font-weight:700;">Multi-Tap Lvl ${i}</p><p style="font-size:12px; color:#888;">Yutuq: +${tapPowers[i]}</p></div>
-        <button class="btn-buy" onclick="buyTap(${i}, ${prices[i]})" ${tapLvl >= i ? 'disabled' : ''}>${prices[i].toLocaleString()}</button>
-      </div>`;
-    }
-  } else if (type === 'limit') {
-    const prices = [0, 2000, 10000, 50000, 250000, 1000000, 5000000];
-    for (let i = 1; i < limits.length; i++) {
-      let label = limits[i] === 999999999 ? "INFINITE (Cheksiz)" : limits[i] + "⚡";
-      cont.innerHTML += `<div class="item-card">
-        <div><p style="font-weight:700;">Limit Lvl ${i}</p><p style="font-size:12px; color:#888;">Hajm: ${label}</p></div>
-        <button class="btn-buy" onclick="buyLimit(${i}, ${prices[i]})" ${limitLvl >= i ? 'disabled' : ''}>${prices[i].toLocaleString()}</button>
-      </div>`;
-    }
-  } else if (type === 'speed') {
-    const prices = [0, 3000, 10000, 30000, 80000, 200000, 500000, 1000000, 2500000];
-    for (let i = 1; i < speeds.length; i++) {
-      cont.innerHTML += `<div class="item-card">
-        <div><p style="font-weight:700;">Recharge Lvl ${i}</p><p style="font-size:12px; color:#888;">Tezlik: +${speeds[i]}⚡/sek</p></div>
-        <button class="btn-buy" onclick="buySpeed(${i}, ${prices[i]})" ${speedLvl >= i ? 'disabled' : ''}>${prices[i].toLocaleString()}</button>
-      </div>`;
-    }
-  } else if (type === 'special') {
-    let cost = refillsLeft > 0 ? "BEPUL" : "1,000";
-    cont.innerHTML = `<div class="item-card">
-      <div><p style="font-weight:700;">Full Tank ⚡</p><p style="font-size:12px; color:#888;">Sizda ${refillsLeft} bepul bor</p></div>
-      <button class="btn-buy" onclick="useFullTank()">${cost}</button>
-    </div>`;
-  }
-}
-
-function buyTap(l, p) { if(coins>=p){ coins-=p; tapLvl=l; updateUI(); showTab('tap'); } }
-function buyLimit(l, p) { if(coins>=p){ coins-=p; limitLvl=l; updateUI(); showTab('limit'); } }
-function buySpeed(l, p) { if(coins>=p){ coins-=p; speedLvl=l; updateUI(); showTab('speed'); } }
-
-function useFullTank() {
-  let cost = refillsLeft > 0 ? 0 : 1000;
-  if (coins >= cost) {
-    coins -= cost;
-    energy = limits[limitLvl];
-    if (refillsLeft > 0) refillsLeft--;
-    tg.showAlert("⚡ Energiya to'ldirildi!");
-    updateUI();
-    showTab('special');
-  } else { tg.showAlert("Mablag' yetarli emas!"); }
-}
-
-// LUCKY SPIN LOGIC
-let spinning = false;
-function doSpin() {
-  const today = new Date().toLocaleDateString();
-  if (lastSpinDate === today) return;
-  
-  if (spinning || coins < 5000) {
-      if (coins < 5000) tg.showAlert("Aylantirish uchun 5,000 tanga kerak!");
-      return;
-  }
-  
-  coins -= 5000;
-  spinning = true;
-  lastSpinDate = today;
-  updateUI();
-
-  const deg = 1800 + Math.random() * 3600;
-  const wheel = document.getElementById("wheelSvg");
-  wheel.style.transform = `rotate(${deg}deg)`;
-
-  setTimeout(() => {
-    spinning = false;
-    const prizes = [25000, 5000, 15000, 0, 500000, 5000];
-    const win = prizes[Math.floor(Math.random() * prizes.length)];
-    coins += win;
-    tg.showAlert(win > 0 ? "Tabriklaymiz! +" + win + " 🪙" : "Bugun omad kelmadi. Ertaga urunib ko'ring!");
-    updateUI();
-  }, 4100);
-}
-
-// DAILY BONUS LOGIC
-function updateBonusUI() {
-  const today = new Date().toLocaleDateString();
-  const btn = document.getElementById("claimBonusBtn");
-  const status = document.getElementById("bonusStatus");
-  const streakTitle = document.getElementById("streakText");
-  
-  streakTitle.innerText = "Kun: " + bonusStreak;
-
-  if (lastBonusDate === today) {
-    btn.disabled = true;
-    btn.innerText = "ERTANGA KELING";
-    btn.style.background = "#333";
-    status.innerText = "Bugungi bonus olindi! 24 soatdan keyin qayting.";
-  } else {
-    btn.disabled = false;
-    btn.innerText = "BONUSNI OLISH (10,000 🪙)";
-    btn.style.background = "var(--accent-green)";
-    status.innerText = "Yangi bonus tayyor! Uni hoziroq qo'lga kiriting.";
-  }
-}
-
-function claimDailyBonus() {
-  const today = new Date().toLocaleDateString();
-  if (lastBonusDate === today) return;
-
-  bonusStreak++;
-  let reward = 10000;
-  let message = "Tabriklaymiz! 10,000 tanga olindi.";
-
-  // Har 100 kunda maxsus bonus (masalan 1,000,000 tanga)
-  if (bonusStreak % 100 === 0) {
-    reward = 1000000;
-    message = "DAHSHAT! " + bonusStreak + "-kunlik maxsus bonus: 1,000,000 tanga!";
-  }
-
-  coins += reward;
-  lastBonusDate = today;
-  
-  save();
-  updateUI();
-  updateBonusUI();
-  
-  if (tg.showAlert) {
-    tg.showAlert(message);
-  } else {
-    alert(message);
-  }
-}
-
-// AUTO ENERGY REGEN
-setInterval(() => {
-  const maxE = limits[limitLvl];
-  if (energy < maxE) {
-    energy += speeds[speedLvl];
-    if (energy > maxE) energy = maxE;
-    updateUI();
-  }
-}, 1000);
-
-// MODAL CONTROLS
-function openM(id) {
-  closeAll();
-  document.getElementById(id).classList.add("open");
-  document.getElementById("overlay").style.display = "block";
-  if (id === 'boostM') showTab('tap');
-  if (id === 'bonusM') updateBonusUI();
-}
-function closeAll() {
-  document.querySelectorAll(".modal").forEach(m => m.classList.remove("open"));
-  document.getElementById("overlay").style.display = "none";
-}
-
-window.onload = () => {
-  updateUI();
-};
+// Balansni har 2 soniyada yangilab turish (OZS TAP o'zgartirsa ko'rinsin)
+setInterval(updateBal, 2000);
 </script>
 </body>
 </html>
